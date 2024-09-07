@@ -34,6 +34,7 @@
 #include <exiv2/error.hpp>
 #include <exiv2/image.hpp>
 #include <exiv2/exif.hpp>
+#include <exiv2/version.hpp>
 
 #define VERSIONSTR "0.2.5-dev"
 
@@ -1034,7 +1035,11 @@ static void process_image (GimpDrawable *drawable) {
 //
 static int read_opts_from_exif(const char *filename) {
 
+#if EXIV2_TEST_VERSION(0,28,0)
+    Exiv2::Image::UniquePtr Exiv2image;
+#else
     Exiv2::Image::AutoPtr Exiv2image;
+#endif
     Exiv2::ExifData exifData;
 
     const lfCamera  **cameras    = 0;
@@ -1062,7 +1067,11 @@ static int read_opts_from_exif(const char *filename) {
             return -1;
         }
     }
+#if EXIV2_TEST_VERSION(0,28,0)
+    catch (Exiv2::Error& e) {
+#else
     catch (Exiv2::AnyError& e) {
+#endif
         if (DEBUG) {
             g_print ("exception on reading data. \n");
         }
